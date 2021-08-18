@@ -13,3 +13,4 @@
 - Thymeleaf
 ***
 ## 학습 내용
+### 2021.08.18 Spring Security 로그인 & 회원가입 기능 적용

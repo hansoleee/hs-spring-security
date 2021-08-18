@@ -3,14 +3,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <title>Register</title>
-
-    <title>Login</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
 
@@ -39,7 +35,7 @@
                             <input type="text" class="form-control form-control-user"
                                    id="email" placeholder="이메일을 입력해 주세요">
                         </div>
-                        <button type="button" class="btn btn-primary w-100">회원가입</button>
+                        <button type="button" class="btn btn-primary w-100" id="submit">회원가입</button>
                     </form>
                     <hr>
                     <div class="mb-4 d-flex justify-content-center">
@@ -51,5 +47,45 @@
     </div>
 </div>
 <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script>
+    let member = {
+        init: function () {
+            let _this = this;
+            let submitBtn = document.getElementById("submit");
+            submitBtn.addEventListener("click", _this.register);
+        },
+
+        register: function () {
+            let header = {};
+            let csrfToken = document.getElementById("_csrf").content;
+            let csrfHeader = document.getElementById("_csrf_header").content;
+            header[csrfHeader] = csrfToken;
+            header["Content-Type"] = "application/json";
+
+            let data = {
+                username: document.querySelector("#username").value,
+                password: document.querySelector("#password").value,
+                email: document.querySelector("#email").value,
+                roleEnglishName: "ROLE_USER",
+            }
+
+            fetch("/api/members/new", {
+                method: "POST",
+                headers: header,
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        alert(result.data + "님 회원 가입을 축하합니다.");
+                        document.location = "/login";
+                        return ;
+                    }
+                    alert(result.message);
+                });
+        }
+    }
+    member.init();
+</script>
 </body>
 </html>
